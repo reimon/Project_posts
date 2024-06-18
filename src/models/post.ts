@@ -13,6 +13,7 @@ export interface PostData {
   eventType: string;
   Datatime: string;
   likes: number;
+  likedBy: number[];
 }
 
 class Post {
@@ -25,6 +26,7 @@ class Post {
   eventType: string;
   Datatime: string;
   likes: number;
+  likedBy: number[];
 
   constructor(data: PostData) {
     this.id = data.id;
@@ -36,6 +38,7 @@ class Post {
     this.eventType = data.eventType;
     this.Datatime = data.Datatime;
     this.likes = data.likes || 0;
+    this.likedBy = data.likedBy || [];
   }
 
   static async findAll(): Promise<PostData[]> {
@@ -59,7 +62,6 @@ class Post {
       throw new Error("Failed to save post");
     }
 
-    // Explicitly map the savedPost properties to a PostData object
     const result: PostData = {
       id: savedPost.id,
       userid: savedPost.userid,
@@ -70,13 +72,28 @@ class Post {
       eventType: savedPost.eventType,
       Datatime: savedPost.Datatime,
       likes: savedPost.likes,
+      likedBy: savedPost.likedBy,
     };
 
     return result;
   }
 
-  async incrementLikes(): Promise<PostData> {
+  async incrementLikes(userId: number): Promise<PostData> {
+    if (this.likedBy.includes(userId)) {
+      throw new Error("User has already liked this post");
+    }
     this.likes += 1;
+    this.likedBy.push(userId);
+    return this.save();
+  }
+
+  async decrementLikes(userId: number): Promise<PostData> {
+    const userIndex = this.likedBy.indexOf(userId);
+    if (userIndex === -1) {
+      throw new Error("User has not liked this post");
+    }
+    this.likes -= 1;
+    this.likedBy.splice(userIndex, 1);
     return this.save();
   }
 

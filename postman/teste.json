@@ -32,7 +32,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"id\": \"3\",\n  \"userid\": 12,\n  \"location\": \"São Paulo, Av. Paulista, 400\",\n  \"latitude\": -23.562928,\n  \"longitude\": -46.653232,\n  \"imagens\": [\n    \"https://g1.globo.com/Noticias/SaoPaulo/foto/0,,20589758-FMM,00.jpg\",\n    \"https://g1.globo.com/Noticias/SaoPaulo/foto/0,,20589758-FMM,00.jpg\",\n    \"https://g1.globo.com/Noticias/SaoPaulo/foto/0,,20589758-FMM,00.jpg\"\n  ],\n  \"eventType\": \"Buraco na pista\",\n  \"Datatime\": \"2019-03-31T22:32:06.822Z\",\n  \"likes\": 0\n}"
+          "raw": "{\n  \"id\": \"3\",\n  \"userid\": 12,\n  \"location\": \"São Paulo, Av. Paulista, 400\",\n  \"latitude\": -23.562928,\n  \"longitude\": -46.653232,\n  \"imagens\": [\n    \"https://g1.globo.com/Noticias/SaoPaulo/foto/0,,20589758-FMM,00.jpg\",\n    \"https://g1.globo.com/Noticias/SaoPaulo/foto/0,,20589758-FMM,00.jpg\",\n    \"https://g1.globo.com/Noticias/SaoPaulo/foto/0,,20589758-FMM,00.jpg\"\n  ],\n  \"eventType\": \"Buraco na pista\",\n  \"Datatime\": \"2019-03-31T22:32:06.822Z\",\n  \"likes\": 0,\n  \"likedBy\": []\n}"
         },
         "url": {
           "raw": "http://localhost:3000/api/post",
@@ -56,7 +56,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"location\": \"Rio de Janeiro, Av. Atlântica, 1000\",\n  \"latitude\": -22.970722,\n  \"longitude\": -43.182365,\n  \"eventType\": \"Alagamento\",\n  \"likes\": 10\n}"
+          "raw": "{\n  \"location\": \"Rio de Janeiro, Av. Atlântica, 1000\",\n  \"latitude\": -22.970722,\n  \"longitude\": -43.182365,\n  \"eventType\": \"Alagamento\",\n  \"likes\": 10,\n  \"likedBy\": []\n}"
         },
         "url": {
           "raw": "http://localhost:3000/api/post/3",
@@ -87,13 +87,46 @@
       "name": "Like a Post",
       "request": {
         "method": "POST",
-        "header": [],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": 12\n}"
+        },
         "url": {
           "raw": "http://localhost:3000/api/post/3/like",
           "protocol": "http",
           "host": ["localhost"],
           "port": "3000",
           "path": ["api", "post", "3", "like"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Dislike a Post",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": 12\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/post/3/dislike",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "post", "3", "dislike"]
         }
       },
       "response": []
