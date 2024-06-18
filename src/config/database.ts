@@ -25,4 +25,14 @@ async function init() {
   await createContainer();
 }
 
-export { init, client, databaseId, containerId };
+async function testConnection() {
+  try {
+    await client.database(databaseId).read();
+    console.log("Database connection is OK");
+  } catch (error) {
+    console.error("Database connection failed:", (error as Error).message);
+    throw error;
+  }
+}
+
+export { init, client, databaseId, containerId, testConnection };

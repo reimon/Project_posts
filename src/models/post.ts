@@ -1,8 +1,9 @@
 import { client, databaseId, containerId } from "../config/database";
+import { Container, ItemDefinition, Resource } from "@azure/cosmos";
 
-const container = client.database(databaseId).container(containerId);
+const container: Container = client.database(databaseId).container(containerId);
 
-interface PostData {
+export interface PostData {
   id: string;
   userid: number;
   location: string;
@@ -51,7 +52,29 @@ class Post {
 
   async save(): Promise<PostData> {
     const { resource: savedPost } = await container.items.upsert(this);
-    return savedPost;
+    if (!savedPost) {
+      throw new Error("Failed to save post");
+    }
+
+    // Explicitly map the savedPost properties to a PostData object
+    const result: PostData = {
+      id: savedPost.id,
+      userid: savedPost.userid,
+      location: savedPost.location,
+      latitude: savedPost.latitude,
+      longitude: savedPost.longitude,
+      imagens: savedPost.imagens,
+      eventType: savedPost.eventType,
+      Datatime: savedPost.Datatime,
+      likes: savedPost.likes,
+    };
+
+    return result;
+  }
+
+  async incrementLikes(): Promise<PostData> {
+    this.likes += 1;
+    return this.save();
   }
 
   async remove(): Promise<void> {

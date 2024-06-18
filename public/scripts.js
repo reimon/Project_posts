@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
         likes: 0,
       }),
     });
+
     const newPost = await response.json();
     addPostToDOM(newPost);
     locationInput.value = "";
@@ -55,8 +56,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function addPostToDOM(post) {
     const li = document.createElement("li");
-    li.textContent = `${post.eventType} at ${post.location} (${post.likes} likes)`;
 
+    // Create a div to hold the post details
+    const postDetails = document.createElement("div");
+    postDetails.innerHTML = `
+      <p><strong>Event Type:</strong> ${post.eventType}</p>
+      <p><strong>Location:</strong> ${post.location}</p>
+      <p><strong>Latitude:</strong> ${post.latitude}</p>
+      <p><strong>Longitude:</strong> ${post.longitude}</p>
+      <p><strong>Likes:</strong> ${post.likes}</p>
+      <p><strong>Images:</strong></p>
+      <div>${post.imagens
+        .map(
+          (url) =>
+            `<img src="${url}" alt="Image" style="width: 100px; height: 100px;">`
+        )
+        .join("")}</div>
+    `;
+
+    // Create a like button
     const likeButton = document.createElement("button");
     likeButton.textContent = "Like";
     likeButton.addEventListener("click", async () => {
@@ -64,9 +82,12 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "POST",
       });
       const updatedPost = await response.json();
-      li.textContent = `${updatedPost.eventType} at ${updatedPost.location} (${updatedPost.likes} likes)`;
+      postDetails.querySelector(
+        "p:nth-child(5)"
+      ).textContent = `Likes: ${updatedPost.likes}`;
     });
 
+    li.appendChild(postDetails);
     li.appendChild(likeButton);
     postList.appendChild(li);
   }

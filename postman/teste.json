@@ -1,0 +1,102 @@
+{
+  "info": {
+    "name": "Projeto Posts API",
+    "description": "A collection of requests to test the Projeto Posts API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get All Posts",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/posts",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "posts"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create a New Post",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": \"3\",\n  \"userid\": 12,\n  \"location\": \"São Paulo, Av. Paulista, 400\",\n  \"latitude\": -23.562928,\n  \"longitude\": -46.653232,\n  \"imagens\": [\n    \"https://g1.globo.com/Noticias/SaoPaulo/foto/0,,20589758-FMM,00.jpg\",\n    \"https://g1.globo.com/Noticias/SaoPaulo/foto/0,,20589758-FMM,00.jpg\",\n    \"https://g1.globo.com/Noticias/SaoPaulo/foto/0,,20589758-FMM,00.jpg\"\n  ],\n  \"eventType\": \"Buraco na pista\",\n  \"Datatime\": \"2019-03-31T22:32:06.822Z\",\n  \"likes\": 0\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/post",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "post"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update a Post",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"location\": \"Rio de Janeiro, Av. Atlântica, 1000\",\n  \"latitude\": -22.970722,\n  \"longitude\": -43.182365,\n  \"eventType\": \"Alagamento\",\n  \"likes\": 10\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/post/3",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "post", "3"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete a Post",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/post/3",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "post", "3"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Like a Post",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/post/3/like",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "post", "3", "like"]
+        }
+      },
+      "response": []
+    }
+  ]
+}

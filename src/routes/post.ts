@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import Post from "../models/post";
+import Post, { PostData } from "../models/post";
 
 const router = Router();
 
@@ -9,7 +9,8 @@ router.get("/posts", async (req: Request, res: Response) => {
     const posts = await Post.findAll();
     res.json(posts);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error getting posts:", (err as Error).message);
+    res.status(500).json({ message: (err as Error).message });
   }
 });
 
@@ -20,7 +21,8 @@ router.post("/post", async (req: Request, res: Response) => {
     const newPost = await post.save();
     res.status(201).json(newPost);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    console.error("Error creating post:", (err as Error).message);
+    res.status(400).json({ message: (err as Error).message });
   }
 });
 
@@ -32,10 +34,11 @@ router.put("/post/:id", async (req: Request, res: Response) => {
 
     Object.assign(post, req.body);
 
-    const updatedPost = await post.save();
+    const updatedPost = await (post as Post).save();
     res.json(updatedPost);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    console.error("Error updating post:", (err as Error).message);
+    res.status(400).json({ message: (err as Error).message });
   }
 });
 
@@ -45,10 +48,11 @@ router.delete("/post/:id", async (req: Request, res: Response) => {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: "Post not found" });
 
-    await post.remove();
+    await (post as Post).remove();
     res.json({ message: "Post deleted" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error deleting post:", (err as Error).message);
+    res.status(500).json({ message: (err as Error).message });
   }
 });
 
@@ -58,11 +62,11 @@ router.post("/post/:id/like", async (req: Request, res: Response) => {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: "Post not found" });
 
-    post.likes += 1;
-    const updatedPost = await post.save();
+    const updatedPost = await (post as Post).incrementLikes();
     res.json(updatedPost);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error liking post:", (err as Error).message);
+    res.status(500).json({ message: (err as Error).message });
   }
 });
 

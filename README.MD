@@ -41,24 +41,13 @@ npm install
 
 ```
 
-Configure Azure Cosmos DB:
-
-Create a config.ts file in the src/config directory with your Cosmos DB configuration:
+CreaCreate a .env file in the root of your project with your Cosmos DB configuration:
 
 ```bash
-const config = {
-  endpoint: "YOUR_COSMOS_DB_ENDPOINT",
-  key: "YOUR_COSMOS_DB_KEY",
-  database: {
-    id: "YOUR_DATABASE_ID",
-  },
-  container: {
-    id: "YOUR_CONTAINER_ID",
-  },
-};
-
-export default config;
-
+COSMOS_DB_ENDPOINT=your-cosmos-db-endpoint
+COSMOS_DB_KEY=your-cosmos-db-key
+COSMOS_DB_DATABASE_ID=your-database-id
+COSMOS_DB_CONTAINER_ID=your-container-id
 ```
 
 Initialize the database:
