@@ -11,6 +11,7 @@ interface PostData {
   imagens: string[];
   eventType: string;
   Datatime: string;
+  likes: number;
 }
 
 class Post {
@@ -22,6 +23,7 @@ class Post {
   imagens: string[];
   eventType: string;
   Datatime: string;
+  likes: number;
 
   constructor(data: PostData) {
     this.id = data.id;
@@ -32,6 +34,7 @@ class Post {
     this.imagens = data.imagens;
     this.eventType = data.eventType;
     this.Datatime = data.Datatime;
+    this.likes = data.likes || 0;
   }
 
   static async findAll(): Promise<PostData[]> {
