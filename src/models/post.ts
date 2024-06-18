@@ -56,6 +56,22 @@ class Post {
     return new Post(post as PostData);
   }
 
+  static async findByUserId(userid: number): Promise<PostData[]> {
+    const querySpec = {
+      query: "SELECT * FROM c WHERE c.userid = @userid",
+      parameters: [
+        {
+          name: "@userid",
+          value: userid,
+        },
+      ],
+    };
+    const { resources: posts } = await container.items
+      .query(querySpec)
+      .fetchAll();
+    return posts;
+  }
+
   async save(): Promise<PostData> {
     const { resource: savedPost } = await container.items.upsert(this);
     if (!savedPost) {

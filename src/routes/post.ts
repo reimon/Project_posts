@@ -14,6 +14,18 @@ router.get("/posts", async (req: Request, res: Response) => {
   }
 });
 
+// Get posts by userId
+router.get("/posts/user/:userid", async (req: Request, res: Response) => {
+  try {
+    const userid = parseInt(req.params.userid);
+    const posts = await Post.findByUserId(userid);
+    res.json(posts);
+  } catch (err) {
+    console.error("Error getting user posts:", (err as Error).message);
+    res.status(500).json({ message: (err as Error).message });
+  }
+});
+
 // Create a new post
 router.post("/post", async (req: Request, res: Response) => {
   const post = new Post(req.body);

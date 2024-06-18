@@ -21,6 +21,21 @@
       "response": []
     },
     {
+      "name": "Get Posts by User ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/posts/user/12",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "posts", "user", "12"]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "Create a New Post",
       "request": {
         "method": "POST",
