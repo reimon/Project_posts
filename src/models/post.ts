@@ -45,9 +45,12 @@ class Post {
     return posts;
   }
 
-  static async findById(id: string): Promise<PostData | null> {
+  static async findById(id: string): Promise<Post | null> {
     const { resource: post } = await container.item(id).read();
-    return post || null;
+    if (!post) {
+      return null;
+    }
+    return new Post(post as PostData);
   }
 
   async save(): Promise<PostData> {

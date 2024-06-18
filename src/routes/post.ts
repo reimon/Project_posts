@@ -34,7 +34,7 @@ router.put("/post/:id", async (req: Request, res: Response) => {
 
     Object.assign(post, req.body);
 
-    const updatedPost = await (post as Post).save();
+    const updatedPost = await post.save();
     res.json(updatedPost);
   } catch (err) {
     console.error("Error updating post:", (err as Error).message);
@@ -48,7 +48,7 @@ router.delete("/post/:id", async (req: Request, res: Response) => {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: "Post not found" });
 
-    await (post as Post).remove();
+    await post.remove();
     res.json({ message: "Post deleted" });
   } catch (err) {
     console.error("Error deleting post:", (err as Error).message);
@@ -62,7 +62,7 @@ router.post("/post/:id/like", async (req: Request, res: Response) => {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: "Post not found" });
 
-    const updatedPost = await (post as Post).incrementLikes();
+    const updatedPost = await post.incrementLikes();
     res.json(updatedPost);
   } catch (err) {
     console.error("Error liking post:", (err as Error).message);
