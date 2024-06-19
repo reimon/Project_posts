@@ -40,28 +40,45 @@ class Post {
     this.imagens = data.imagens;
     this.eventType = data.eventType;
     this.Datatime = data.Datatime;
-    this.likes = data.likes || 0;
-    this.likedBy = data.likedBy || [];
+    this.likes = data.likes;
+    this.likedBy = data.likedBy;
   }
 
-  static async findAll(): Promise<PostData[]> {
+  static async findAll(): Promise<Post[]> {
+    const querySpec = {
+      query: "SELECT * FROM c",
+    };
     const { resources: posts } = await container.items
-      .query("SELECT * FROM c")
+      .query(querySpec)
       .fetchAll();
-    return posts;
+    return posts.map((post) => new Post(post));
+  }
+
+  static async findByUserId(userid: number): Promise<Post[]> {
+    const querySpec = {
+      query: "SELECT * FROM c WHERE c.userid = @userid",
+      parameters: [{ name: "@userid", value: userid }],
+    };
+    const { resources: posts } = await container.items
+      .query(querySpec)
+      .fetchAll();
+    return posts.map((post) => new Post(post));
+  }
+
+  static async findLastPostIdByUserId(userid: number): Promise<number> {
+    const querySpec = {
+      query: "SELECT VALUE MAX(c.post_id) FROM c WHERE c.userid = @userid",
+      parameters: [{ name: "@userid", value: userid }],
+    };
+    const { resources } = await container.items.query(querySpec).fetchAll();
+    return resources[0] || 0;
   }
 
   static async findById(id: string): Promise<Post | null> {
-    try {
-      const { resource } = await container.item(id, id).read<PostData>();
-      if (!resource) {
-        return null;
-      }
-      return new Post(resource);
-    } catch (err) {
-      console.error("Error finding post by id:", err);
-      return null;
-    }
+    const { resource: post } = await container
+      .item(id, undefined)
+      .read<PostData>();
+    return post ? new Post(post) : null;
   }
 
   static async findByPostId(post_id: number): Promise<Post | null> {
@@ -78,33 +95,13 @@ class Post {
     return new Post(posts[0]);
   }
 
-  static async findByUserId(userid: number): Promise<PostData[]> {
-    const querySpec = {
-      query: "SELECT * FROM c WHERE c.userid = @userid",
-      parameters: [{ name: "@userid", value: userid }],
-    };
-    const { resources: posts } = await container.items
-      .query(querySpec)
-      .fetchAll();
-    return posts;
-  }
-
-  static async findLastPostIdByUserId(userid: number): Promise<number> {
-    const querySpec = {
-      query: "SELECT VALUE MAX(c.post_id) FROM c WHERE c.userid = @userid",
-      parameters: [{ name: "@userid", value: userid }],
-    };
-    const { resources } = await container.items.query(querySpec).fetchAll();
-    return resources[0] || 0;
-  }
-
   async save(): Promise<PostData> {
     const { resource: savedPost } = await container.items.upsert(this);
     if (!savedPost) {
       throw new Error("Failed to save post");
     }
 
-    const postData: PostData = {
+    return {
       id: savedPost.id,
       post_id: savedPost.post_id,
       userid: savedPost.userid,
@@ -116,45 +113,42 @@ class Post {
       Datatime: savedPost.Datatime,
       likes: savedPost.likes,
       likedBy: savedPost.likedBy,
-    };
-
-    return postData;
-  }
-
-  async incrementLikes(userId: number): Promise<PostData> {
-    if (this.likedBy.includes(userId)) {
-      throw new Error("User has already liked this post");
-    }
-    this.likes += 1;
-    this.likedBy.push(userId);
-    return this.save();
-  }
-
-  async decrementLikes(userId: number): Promise<PostData> {
-    const userIndex = this.likedBy.indexOf(userId);
-    if (userIndex === -1) {
-      throw new Error("User has not liked this post");
-    }
-    this.likes -= 1;
-    this.likedBy.splice(userIndex, 1);
-    return this.save();
+    } as PostData;
   }
 
   static async deleteByPostId(post_id: number): Promise<void> {
-    try {
-      const post = await this.findByPostId(post_id);
-      if (!post) {
-        throw new Error(`Post with post_id ${post_id} not found`);
-      }
-      await container.item(post.id, undefined).delete();
-    } catch (err) {
-      console.error("Error deleting post:", err);
-      throw new Error(
-        `Failed to delete post with post_id ${post_id}: ${
-          (err as Error).message
-        }`
-      );
+    const querySpec = {
+      query: "SELECT * FROM c WHERE c.post_id = @post_id",
+      parameters: [{ name: "@post_id", value: post_id }],
+    };
+    const { resources: posts } = await container.items
+      .query(querySpec)
+      .fetchAll();
+    if (posts.length === 0) {
+      throw new Error(`Post with ID ${post_id} not found`);
     }
+    for (const post of posts) {
+      await container.item(post.id, undefined).delete();
+    }
+  }
+
+  async incrementLikes(userId: number): Promise<PostData> {
+    if (!this.likedBy.includes(userId)) {
+      this.likes += 1;
+      this.likedBy.push(userId);
+      return await this.save();
+    }
+    throw new Error("User already liked this post");
+  }
+
+  async decrementLikes(userId: number): Promise<PostData> {
+    const index = this.likedBy.indexOf(userId);
+    if (index !== -1) {
+      this.likes -= 1;
+      this.likedBy.splice(index, 1);
+      return await this.save();
+    }
+    throw new Error("User has not liked this post");
   }
 }
 

@@ -175,6 +175,60 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "Get Comments by Post ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/comments/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "comments", "1"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create a New Comment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"post_id\": 1,\n  \"user_id\": 12,\n  \"content\": \"Este é um comentário de teste.\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/comments",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "comments"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete a Comment",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/comments/{id}",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "comments", "{id}"]
+        }
+      },
+      "response": []
     }
   ]
 }
