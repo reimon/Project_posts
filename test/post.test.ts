@@ -1,8 +1,8 @@
 import request from "supertest";
 import express from "express";
 import bodyParser from "body-parser";
-import postRoutes from "../routes/post";
-import commentRoutes from "../routes/comment";
+import postRoutes from "../src/routes/post";
+import commentRoutes from "../src/routes/comment";
 
 // Cria uma instância do aplicativo Express e configura o middleware
 const app = express();
