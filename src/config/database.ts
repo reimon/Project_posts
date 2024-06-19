@@ -1,38 +1,31 @@
 import { CosmosClient } from "@azure/cosmos";
-import config from "./config";
+import dotenv from "dotenv";
 
-const client = new CosmosClient({ endpoint: config.endpoint, key: config.key });
+dotenv.config();
 
-const databaseId = config.database.id;
-const containerId = config.container.id;
+const endpoint = process.env.COSMOS_DB_ENDPOINT!;
+const key = process.env.COSMOS_DB_KEY!;
+const databaseId = process.env.COSMOS_DB_DATABASE_ID!;
+const containerId = process.env.COSMOS_DB_CONTAINER_ID!;
 
-async function createDatabase() {
+if (!endpoint || !key || !databaseId || !containerId) {
+  throw new Error(
+    "Please make sure you have the necessary environment variables set"
+  );
+}
+
+const client = new CosmosClient({ endpoint, key });
+
+export { client, databaseId, containerId };
+
+export async function initializeDatabase() {
   const { database } = await client.databases.createIfNotExists({
     id: databaseId,
   });
-  console.log(`Created database:\n${database.id}\n`);
-}
+  console.log(`Created database: ${database.id}`);
 
-async function createContainer() {
   const { container } = await client
     .database(databaseId)
     .containers.createIfNotExists({ id: containerId });
-  console.log(`Created container:\n${container.id}\n`);
+  console.log(`Created container: ${container.id}`);
 }
-
-async function init() {
-  await createDatabase();
-  await createContainer();
-}
-
-async function testConnection() {
-  try {
-    await client.database(databaseId).read();
-    console.log("Database connection is OK");
-  } catch (error) {
-    console.error("Database connection failed:", (error as Error).message);
-    throw error;
-  }
-}
-
-export { init, client, databaseId, containerId, testConnection };

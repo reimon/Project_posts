@@ -1,52 +1,24 @@
-import express, { Request, Response, NextFunction } from "express";
-import path from "path";
+import express from "express";
 import bodyParser from "body-parser";
-import postRouter from "./routes/post";
-import { testConnection } from "./config/database";
+import postRoutes from "./routes/post";
+import commentRoutes from "./routes/comment";
+import { initializeDatabase } from "./config/database";
 
 const app = express();
+const port = process.env.PORT || 3000;
 
-// Middleware setup
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use("/api", postRoutes);
+app.use("/api", commentRoutes);
 
-// Routes
-app.use("/api", postRouter);
-
-// Custom Error type
-interface CustomError extends Error {
-  status?: number;
-}
-
-// Error handling
-app.use((req: Request, res: Response, next: NextFunction) => {
-  const err: CustomError = new Error("Not Found");
-  err.status = 404;
-  next(err);
-});
-
-app.use((err: CustomError, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.message); // Log the error message
-  res.status(err.status || 500);
-  res.json({
-    message: err.message,
-    error: req.app.get("env") === "development" ? err : {},
-  });
-});
-
-const PORT = process.env.PORT || 3000;
-
-async function startServer() {
-  try {
-    await testConnection();
-    app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
+initializeDatabase()
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
     });
-  } catch (error) {
-    console.error("Failed to start the server:", (error as Error).message);
-  }
-}
-
-startServer();
+  })
+  .catch((err: any) => {
+    console.error("Failed to initialize database:", err);
+  });
 
 export default app;
