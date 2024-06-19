@@ -83,11 +83,10 @@ router.put("/post/:id", async (req: Request, res: Response) => {
 });
 
 // Delete a post
-router.delete("/post/:id", async (req: Request, res: Response) => {
+router.delete("/post/:post_id", async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
-    console.log(`Attempting to delete post with ID ${id}`);
-    await Post.deleteById(id);
+    const post_id = parseInt(req.params.post_id);
+    await Post.deleteByPostId(post_id);
     res.json({ message: "Post deleted" });
   } catch (err) {
     console.error("Error deleting post:", (err as Error).message);

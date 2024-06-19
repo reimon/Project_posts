@@ -54,7 +54,6 @@ class Post {
   static async findById(id: string): Promise<Post | null> {
     try {
       const { resource } = await container.item(id, id).read<PostData>();
-      console.log(`Resource found: ${JSON.stringify(resource)}`);
       if (!resource) {
         return null;
       }
@@ -141,20 +140,19 @@ class Post {
     return this.save();
   }
 
-  static async deleteById(id: string): Promise<void> {
+  static async deleteByPostId(post_id: number): Promise<void> {
     try {
-      console.log(`Attempting to find post with ID ${id}`);
-      const { resource } = await container.item(id, undefined).read<PostData>();
-      console.log(`Resource found for deletion: ${JSON.stringify(resource)}`);
-      if (!resource) {
-        throw new Error(`Post with ID ${id} not found`);
+      const post = await this.findByPostId(post_id);
+      if (!post) {
+        throw new Error(`Post with post_id ${post_id} not found`);
       }
-      await container.item(id, undefined).delete();
-      console.log(`Successfully deleted post with ID ${id}`);
+      await container.item(post.id, undefined).delete();
     } catch (err) {
       console.error("Error deleting post:", err);
       throw new Error(
-        `Failed to delete post with ID ${id}: ${(err as Error).message}`
+        `Failed to delete post with post_id ${post_id}: ${
+          (err as Error).message
+        }`
       );
     }
   }
