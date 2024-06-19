@@ -57,6 +57,7 @@ router.post("/post", async (req: Request, res: Response) => {
     imagens,
     eventType,
     Datatime,
+    description, // Adicionado campo description
   } = req.body;
   try {
     const lastPostId = await Post.findLastPostIdByUserId(userid);
@@ -73,6 +74,7 @@ router.post("/post", async (req: Request, res: Response) => {
       Datatime,
       likes: 0,
       likedBy: [],
+      description, // Adicionado campo description
     });
     const newPost = await post.save();
     res.status(201).json(newPost);
@@ -83,20 +85,29 @@ router.post("/post", async (req: Request, res: Response) => {
 });
 
 // Update a post
-router.put("/post/:id", async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { location, latitude, longitude, eventType, likes, likedBy } = req.body;
+router.put("/post/:post_id", async (req: Request, res: Response) => {
+  const { post_id } = req.params;
+  const {
+    location,
+    latitude,
+    longitude,
+    imagens,
+    eventType,
+    Datatime,
+    description, // Adicionado campo description
+  } = req.body;
   try {
-    const post = await Post.findById(id);
+    const post = await Post.findById(post_id);
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
     post.location = location;
     post.latitude = latitude;
     post.longitude = longitude;
+    post.imagens = imagens;
     post.eventType = eventType;
-    post.likes = likes;
-    post.likedBy = likedBy;
+    post.Datatime = Datatime;
+    post.description = description; // Adicionado campo description
     const updatedPost = await post.save();
     res.json(updatedPost);
   } catch (err) {
@@ -131,7 +142,7 @@ router.post("/post/:post_id/like", async (req: Request, res: Response) => {
   const { post_id } = req.params;
   const { userId } = req.body;
   try {
-    const post = await Post.findById(post_id);
+    const post = await Post.findByPostId(parseInt(post_id));
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
@@ -148,7 +159,7 @@ router.post("/post/:post_id/dislike", async (req: Request, res: Response) => {
   const { post_id } = req.params;
   const { userId } = req.body;
   try {
-    const post = await Post.findById(post_id);
+    const post = await Post.findByPostId(parseInt(post_id));
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
