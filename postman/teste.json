@@ -36,6 +36,21 @@
       "response": []
     },
     {
+      "name": "Get Posts Grouped by User",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/posts/grouped-by-user",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "posts", "grouped-by-user"]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "Create a New Post",
       "request": {
         "method": "POST",
@@ -47,7 +62,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"id\": \"3\",\n  \"userid\": 12,\n  \"location\": \"São Paulo, Av. Paulista, 400\",\n  \"latitude\": -23.562928,\n  \"longitude\": -46.653232,\n  \"imagens\": [\n    \"https://g1.globo.com/Noticias/SaoPaulo/foto/0,,20589758-FMM,00.jpg\",\n    \"https://g1.globo.com/Noticias/SaoPaulo/foto/0,,20589758-FMM,00.jpg\",\n    \"https://g1.globo.com/Noticias/SaoPaulo/foto/0,,20589758-FMM,00.jpg\"\n  ],\n  \"eventType\": \"Buraco na pista\",\n  \"Datatime\": \"2019-03-31T22:32:06.822Z\",\n  \"likes\": 0,\n  \"likedBy\": []\n}"
+          "raw": "{\n  \"userid\": 12,\n  \"location\": \"São Paulo, Av. Paulista, 400\",\n  \"latitude\": -23.562928,\n  \"longitude\": -46.653232,\n  \"imagens\": [\n    \"https://g1.globo.com/Noticias/SaoPaulo/foto/0,,20589758-FMM,00.jpg\"\n  ],\n  \"eventType\": \"Buraco na pista\",\n  \"Datatime\": \"2019-03-31T22:32:06.822Z\"\n}"
         },
         "url": {
           "raw": "http://localhost:3000/api/post",
@@ -89,11 +104,11 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "http://localhost:3000/api/post/3",
+          "raw": "http://localhost:3000/api/post/3/12",
           "protocol": "http",
           "host": ["localhost"],
           "port": "3000",
-          "path": ["api", "post", "3"]
+          "path": ["api", "post", "3", "12"]
         }
       },
       "response": []
@@ -142,6 +157,21 @@
           "host": ["localhost"],
           "port": "3000",
           "path": ["api", "post", "3", "dislike"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete User and Their Posts",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/user/12",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "user", "12"]
         }
       },
       "response": []

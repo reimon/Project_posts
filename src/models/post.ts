@@ -1,10 +1,11 @@
 import { client, databaseId, containerId } from "../config/database";
-import { Container, ItemDefinition, Resource } from "@azure/cosmos";
+import { Container } from "@azure/cosmos";
 
 const container: Container = client.database(databaseId).container(containerId);
 
 export interface PostData {
   id: string;
+  post_id: number;
   userid: number;
   location: string;
   latitude: number;
@@ -18,6 +19,7 @@ export interface PostData {
 
 class Post {
   id: string;
+  post_id: number;
   userid: number;
   location: string;
   latitude: number;
@@ -30,6 +32,7 @@ class Post {
 
   constructor(data: PostData) {
     this.id = data.id;
+    this.post_id = data.post_id;
     this.userid = data.userid;
     this.location = data.location;
     this.latitude = data.latitude;
@@ -49,27 +52,51 @@ class Post {
   }
 
   static async findById(id: string): Promise<Post | null> {
-    const { resource: post } = await container.item(id).read();
-    if (!post) {
+    try {
+      const { resource } = await container.item(id, id).read<PostData>();
+      console.log(`Resource found: ${JSON.stringify(resource)}`);
+      if (!resource) {
+        return null;
+      }
+      return new Post(resource);
+    } catch (err) {
+      console.error("Error finding post by id:", err);
       return null;
     }
-    return new Post(post as PostData);
+  }
+
+  static async findByPostId(post_id: number): Promise<Post | null> {
+    const querySpec = {
+      query: "SELECT * FROM c WHERE c.post_id = @post_id",
+      parameters: [{ name: "@post_id", value: post_id }],
+    };
+    const { resources: posts } = await container.items
+      .query(querySpec)
+      .fetchAll();
+    if (posts.length === 0) {
+      return null;
+    }
+    return new Post(posts[0]);
   }
 
   static async findByUserId(userid: number): Promise<PostData[]> {
     const querySpec = {
       query: "SELECT * FROM c WHERE c.userid = @userid",
-      parameters: [
-        {
-          name: "@userid",
-          value: userid,
-        },
-      ],
+      parameters: [{ name: "@userid", value: userid }],
     };
     const { resources: posts } = await container.items
       .query(querySpec)
       .fetchAll();
     return posts;
+  }
+
+  static async findLastPostIdByUserId(userid: number): Promise<number> {
+    const querySpec = {
+      query: "SELECT VALUE MAX(c.post_id) FROM c WHERE c.userid = @userid",
+      parameters: [{ name: "@userid", value: userid }],
+    };
+    const { resources } = await container.items.query(querySpec).fetchAll();
+    return resources[0] || 0;
   }
 
   async save(): Promise<PostData> {
@@ -78,8 +105,9 @@ class Post {
       throw new Error("Failed to save post");
     }
 
-    const result: PostData = {
+    const postData: PostData = {
       id: savedPost.id,
+      post_id: savedPost.post_id,
       userid: savedPost.userid,
       location: savedPost.location,
       latitude: savedPost.latitude,
@@ -91,7 +119,7 @@ class Post {
       likedBy: savedPost.likedBy,
     };
 
-    return result;
+    return postData;
   }
 
   async incrementLikes(userId: number): Promise<PostData> {
@@ -113,8 +141,22 @@ class Post {
     return this.save();
   }
 
-  async remove(): Promise<void> {
-    await container.item(this.id).delete();
+  static async deleteById(id: string): Promise<void> {
+    try {
+      console.log(`Attempting to find post with ID ${id}`);
+      const { resource } = await container.item(id, undefined).read<PostData>();
+      console.log(`Resource found for deletion: ${JSON.stringify(resource)}`);
+      if (!resource) {
+        throw new Error(`Post with ID ${id} not found`);
+      }
+      await container.item(id, undefined).delete();
+      console.log(`Successfully deleted post with ID ${id}`);
+    } catch (err) {
+      console.error("Error deleting post:", err);
+      throw new Error(
+        `Failed to delete post with ID ${id}: ${(err as Error).message}`
+      );
+    }
   }
 }
 

@@ -26,10 +26,37 @@ router.get("/posts/user/:userid", async (req: Request, res: Response) => {
   }
 });
 
+// Get posts grouped by user
+router.get("/posts/grouped-by-user", async (req: Request, res: Response) => {
+  try {
+    const posts = await Post.findAll();
+    const groupedPosts = posts.reduce((acc: Record<number, any>, post) => {
+      if (!acc[post.userid]) {
+        acc[post.userid] = {
+          userid: post.userid,
+          posts: [],
+        };
+      }
+      acc[post.userid].posts.push(post);
+      return acc;
+    }, {});
+    res.json(Object.values(groupedPosts));
+  } catch (err) {
+    console.error(
+      "Error getting posts grouped by user:",
+      (err as Error).message
+    );
+    res.status(500).json({ message: (err as Error).message });
+  }
+});
+
 // Create a new post
 router.post("/post", async (req: Request, res: Response) => {
-  const post = new Post(req.body);
+  const { userid, ...rest } = req.body;
   try {
+    const lastPostId = await Post.findLastPostIdByUserId(userid);
+    const post_id = lastPostId + 1;
+    const post = new Post({ id: "", post_id, userid, ...rest });
     const newPost = await post.save();
     res.status(201).json(newPost);
   } catch (err) {
@@ -41,10 +68,11 @@ router.post("/post", async (req: Request, res: Response) => {
 // Update a post
 router.put("/post/:id", async (req: Request, res: Response) => {
   try {
-    const post = await Post.findById(req.params.id);
+    const id = req.params.id;
+    const post = await Post.findById(id);
     if (!post) return res.status(404).json({ message: "Post not found" });
 
-    Object.assign(post, req.body);
+    Object.assign(post, req.body, { id });
 
     const updatedPost = await post.save();
     res.json(updatedPost);
@@ -57,10 +85,9 @@ router.put("/post/:id", async (req: Request, res: Response) => {
 // Delete a post
 router.delete("/post/:id", async (req: Request, res: Response) => {
   try {
-    const post = await Post.findById(req.params.id);
-    if (!post) return res.status(404).json({ message: "Post not found" });
-
-    await post.remove();
+    const id = req.params.id;
+    console.log(`Attempting to delete post with ID ${id}`);
+    await Post.deleteById(id);
     res.json({ message: "Post deleted" });
   } catch (err) {
     console.error("Error deleting post:", (err as Error).message);
@@ -77,7 +104,7 @@ router.post("/post/:id/like", async (req: Request, res: Response) => {
       .json({ message: "User ID is required to like a post" });
   }
   try {
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findByPostId(parseInt(req.params.id));
     if (!post) return res.status(404).json({ message: "Post not found" });
 
     const updatedPost = await post.incrementLikes(userId);
@@ -97,7 +124,7 @@ router.post("/post/:id/dislike", async (req: Request, res: Response) => {
       .json({ message: "User ID is required to dislike a post" });
   }
   try {
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findByPostId(parseInt(req.params.id));
     if (!post) return res.status(404).json({ message: "Post not found" });
 
     const updatedPost = await post.decrementLikes(userId);
