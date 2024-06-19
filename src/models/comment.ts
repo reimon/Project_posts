@@ -35,8 +35,7 @@ class Comment {
 
   static async findByPostId(post_id: number): Promise<Comment[]> {
     const querySpec = {
-      query:
-        'SELECT * FROM c WHERE c.post_id = @post_id AND c.type = "comment"',
+      query: "SELECT * FROM c WHERE c.post_id = @post_id",
       parameters: [{ name: "@post_id", value: post_id }],
     };
     const { resources: comments } = await container.items
